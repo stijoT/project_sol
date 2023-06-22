@@ -2,78 +2,63 @@
 pragma solidity ^0.8.9;
 
 
+
+contract Caseholder{
+    uint256 public arren=0;
+    mapping(address=>CaseRecords) public caseMapping;
+    CaseRecords[] public cases;
+
+    function createCase(string memory _case_no,string[] memory _accused) public{
+        CaseRecords newCase=new CaseRecords();
+        newCase.CaseInsert(_case_no,_accused);
+        cases.push(newCase);
+        arren++;
+    }
+
+
+
+    function updateCase(address contactAddr,string memory _case_no,string[] memory _accused) public{
+        CaseRecords _case=CaseRecords(contactAddr);
+        _case.CaseInsert(_case_no,_accused);
+    }
+
+
+
+    function viewCaseNo(address contactAddr) view public returns (string memory){
+        CaseRecords _case=CaseRecords(contactAddr);
+        return _case.seeNo();
+    }
+
+
+    function viewAccused(address contactAddr) view public returns (string[] memory){
+        CaseRecords _case=CaseRecords(contactAddr);
+        return _case.seeAccused();
+    }
+}
+
+
+
+
+
 contract CaseRecords {
-    struct Case {
-        string case_no;
-        string[] accused;
-        uint256 case_id;
-    }
+    
+    string case_no;
+    string[] accused;
 
-    mapping(uint256 => Case) public cases;
+    function CaseInsert(string memory _case_no,string[] memory _accused) public {
 
-    uint256 public numberOfCases = 0;
-
-    function createCase(string memory _case_no,string[] memory _accused) public returns (uint256) {
-        Case storage c = cases[numberOfCases];
-
-        c.case_no=_case_no;
-        c.accused=_accused;
-        c.case_id=numberOfCases;
-
-        numberOfCases++;
-
-        return numberOfCases - 1;
-    }
-
-    function updateCase(string memory _case_no,string[] memory _accused,uint256 _case_id) public returns (uint256) {
-        Case storage c = cases[numberOfCases];
-
-        c.case_no=_case_no;
-        c.accused=_accused;
-        c.case_id=_case_id;
-
-        numberOfCases++;
-
-        return numberOfCases - 1;
+        case_no=_case_no;
+        accused=_accused;
     }
 
 
-    function viewCases(string memory _case_no) view public returns (string[] memory){
-        for(uint i = 0; i < numberOfCases; i++) {
-            Case storage item = cases[i];
-            if(keccak256(bytes(item.case_no)) == keccak256(bytes(_case_no)))
-                return (item.accused);
-        }
-        string[] memory temp;
-        return temp;
+    function seeNo() view public returns (string memory){
+        return case_no;
     }
 
-    function viewCases_id(uint256 _case_id) view public returns (string[] memory){
-        return (cases[_case_id].accused);
+
+    function seeAccused() view public returns (string[] memory){
+        return accused;
     }
-
-    function viewAll(uint256 _case_id) view public returns (string memory,string[] memory,uint){
-        return (cases[_case_id].case_no,cases[_case_id].accused,cases[_case_id].case_id);
-    }
-
-    // function viewAllAccused(uint256 _case_id) view public returns (string[] memory){
-    //     string[] memory temp;
-    //     uint256 val=_case_id;
-    //     bool flag;
-    //     while(cases[val].case_id != val){
-    //         for(uint i=0;i<cases[val].accused.length;i++){
-    //             flag=false;
-    //             for(uint j=0; j< temp.length ; j++){
-    //                 if(keccak256(bytes(temp[j])) == keccak256(bytes(cases[val].accused[i])))
-    //                     flag=true;
-    //             }
-    //             if(!flag)
-    //                 temp[(temp.length)]=cases[val].accused[i];
-    //         }
-    //         val=cases[val].case_id;
-    //     }
-    //     return temp;
-    // }
-
 
 }
